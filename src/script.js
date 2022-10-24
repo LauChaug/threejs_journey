@@ -1,5 +1,6 @@
 import './style.css'
 import * as THREE from 'three'
+import gsap from 'gsap'
 import { Mesh, MeshBasicMaterial } from 'three';
 
 console.log(THREE);
@@ -38,7 +39,7 @@ group.add(cube1, cube2, cube3)
 
 group.position.y = 10
 group.scale.y = 2
-group.rotation.y = 70
+// group.rotation.y = 70
 
 const sizes = {
   width: 800,
@@ -61,5 +62,24 @@ const canvas = document.querySelector('.webgl')
 console.log(canvas);
 const renderer = new THREE.WebGLRenderer({ canvas })
 renderer.setSize(sizes.width, sizes.height)
-
 renderer.render(scene, camera)
+
+// let time = Date.now()
+// const clock = new THREE.Clock()
+console.log(gsap);
+gsap.to(group.position, { duration: 1, delay: 1, x: 40 })
+gsap.to(group.position, { duration: 1, delay: 3, x: 0 })
+
+const tick = () => {
+  // const currentTime = Date.now()
+  // const deltaTime = currentTime - time
+  // time = currentTime
+  // group.rotation.x -= 0.01
+  // group.rotation.y += 0.001 * deltaTime
+  // const elapsedTime = clock.getElapsedTime()
+  // console.log(elapsedTime);
+  // group.rotation.y = Math.cos(elapsedTime * 2)
+  renderer.render(scene, camera)
+  requestAnimationFrame(tick)
+}
+tick()
