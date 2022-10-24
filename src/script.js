@@ -1,7 +1,7 @@
 import './style.css'
 import * as THREE from 'three'
 import gsap from 'gsap'
-import { MeshBasicMaterial } from 'three';
+import { BufferAttribute, Mesh, MeshBasicMaterial } from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 
@@ -34,25 +34,37 @@ const scene = new THREE.Scene()
 
 const group = new THREE.Group()
 scene.add(group)
-const cube1 = new THREE.Mesh(
-  new THREE.BoxGeometry(10, 10, 10),
-  new MeshBasicMaterial({ color: 0xff0000 })
-)
-const cube2 = new THREE.Mesh(
-  new THREE.BoxGeometry(10, 10, 10),
-  new MeshBasicMaterial({ color: 0x00ff00 })
-)
-const cube3 = new THREE.Mesh(
-  new THREE.BoxGeometry(10, 10, 10),
-  new MeshBasicMaterial({ color: 0x0000ff })
-)
-cube2.position.x = 20
-cube3.position.x = -20
-group.add(cube1, cube2, cube3)
+// const cube1 = new THREE.Mesh(
+//   new THREE.BoxGeometry(10, 10, 10, 2),
+//   new MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+// )
+// const cube2 = new THREE.Mesh(
+//   new THREE.BoxGeometry(10, 10, 10),
+//   new MeshBasicMaterial({ color: 0x00ff00 })
+// )
+// const cube3 = new THREE.Mesh(
+//   new THREE.BoxGeometry(10, 10, 10),
+//   new MeshBasicMaterial({ color: 0x0000ff })
+// )
+// cube2.position.x = 20
+// cube3.position.x = -20
+// group.add(cube1, cube2, cube3)
 
-group.position.y = 5
+// group.position.y = 5
 // group.scale.y = 2
 // group.rotation.y = 70
+const geometry = new THREE.BufferGeometry()
+
+const count = 50
+const positionArray = new Float32Array(count * 3 * 3)
+for (let i = 0; i < count * 3 * 3; i++) {
+  positionArray[i] = (Math.random() - 0.5) * 4
+}
+const positionAttribute = new BufferAttribute(positionArray, 3)
+geometry.setAttribute('position', positionAttribute)
+const material = new MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+const cube = new THREE.Mesh(geometry, material)
+group.add(cube)
 
 const sizes = {
   width: window.innerWidth,
@@ -120,8 +132,9 @@ orbitControls.mouseButtons = {
 }
 orbitControls.enableDamping = true
 
-const axesHelper = new THREE.AxesHelper(500)
-scene.add(axesHelper)
+// 添加辅助标线
+// const axesHelper = new THREE.AxesHelper(500)
+// scene.add(axesHelper)
 
 // console.log(cube.position.distanceTo(camera.position));
 
