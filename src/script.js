@@ -55,12 +55,47 @@ group.position.y = 5
 // group.rotation.y = 70
 
 const sizes = {
-  width: 800,
-  height: 600
+  width: window.innerWidth,
+  height: window.innerHeight
 }
 
+// resizewindow
+window.addEventListener('resize', () => {
+  // 重新获取视口尺寸
+  sizes.width = window.innerWidth
+  sizes.height = window.innerHeight
+
+  // 重新设置camera的aspect属性
+  camera.aspect = sizes.width / sizes.height
+  // 更新camera的投影矩阵
+  camera.updateProjectionMatrix()
+  // 重新设置渲染器的尺寸
+  renderer.setSize(sizes.width, sizes.height)
+  // 在窗口尺寸发生变化或换屏的时候也需要重新设置设备像素比
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+})
+
+// 设置双击切换到全屏 fullscreen 兼容safari
+window.addEventListener('dblclick', () => {
+  const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement
+  if (!fullscreenElement) {
+    if (canvas.requestFullscreen) {
+      canvas.requestFullscreen()
+    } else if (canvas.webkitRequestFullscreen) {
+      canvas.webkitRequestFullscreen()
+    }
+  }
+  else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen()
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen()
+    }
+  }
+})
+
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 1.0, 100)
-camera.position.set(1, 5, 20)
+camera.position.set(1, 5, 30)
 // camera.position.x = 40
 // camera.position.y = 40
 camera.lookAt(group.position)
@@ -70,11 +105,19 @@ const canvas = document.querySelector('.webgl')
 console.log(canvas);
 const renderer = new THREE.WebGLRenderer({ canvas })
 renderer.setSize(sizes.width, sizes.height)
+// 设置设备像素比,最高为2
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 
 // OrbientControls
 // console.log(OrbitControls);
 const orbitControls = new OrbitControls(camera, canvas)
+// orbitControls.enabled = false
+orbitControls.mouseButtons = {
+  LEFT: null,
+  MIDDLE: THREE.MOUSE.DOLLY,
+  RIGHT: THREE.MOUSE.ROTATE
+}
 orbitControls.enableDamping = true
 
 const axesHelper = new THREE.AxesHelper(500)
