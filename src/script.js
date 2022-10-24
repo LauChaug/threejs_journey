@@ -32,10 +32,12 @@ const cube3 = new THREE.Mesh(
   new THREE.BoxGeometry(10, 10, 10),
   new MeshBasicMaterial({ color: 0x0000ff })
 )
-cube2.position.set(15, 15, 15)
-cube3.position.set(-15, -15, -15)
+cube2.position.x = 20
+cube3.position.x = -20
 group.add(cube1, cube2, cube3)
 
+group.position.y = 10
+group.scale.y = 2
 group.rotation.y = 70
 
 const sizes = {
