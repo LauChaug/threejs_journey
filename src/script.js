@@ -1,8 +1,32 @@
 import './style.css'
 import * as THREE from 'three'
 import gsap from 'gsap'
+import * as dat from 'dat.gui'
 import { BufferAttribute, Mesh, MeshBasicMaterial } from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+
+const parameters = {
+  color: 0x00ff00,
+  // 定义一个自旋函数
+  spin: () => {
+    gsap.to(cube.rotation, { duration: 3, y: cube.rotation.y + 5 })
+  }
+}
+
+// 初始化gui面板时传递对象参数，设置closed为true，gui面板关闭状态
+const gui = new dat.GUI({ closed: true })
+
+// 隐藏gui面板
+// gui.hide()
+
+// 添加自旋函数
+gui.add(parameters, 'spin')
+
+gui
+  .addColor(parameters, 'color')
+  .onChange(() => {
+    cube.material.color.set(parameters.color)
+  })
 
 
 // Cursor
@@ -62,7 +86,7 @@ for (let i = 0; i < count * 3 * 3; i++) {
 }
 const positionAttribute = new BufferAttribute(positionArray, 3)
 geometry.setAttribute('position', positionAttribute)
-const material = new MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+const material = new MeshBasicMaterial({ color: parameters.color, wireframe: true })
 const cube = new THREE.Mesh(geometry, material)
 group.add(cube)
 
@@ -132,6 +156,21 @@ orbitControls.mouseButtons = {
 }
 orbitControls.enableDamping = true
 
+// DEBUG
+// console.log(dat);
+gui.add(group.position, 'y', -3, 3, 0.01)
+gui.add(group.position, 'x', -3, 3, 0.01)
+gui.add(group.position, 'z', -3, 10, 0.01)
+
+
+
+gui
+  .add(cube, 'visible')
+
+gui
+  .add(material, 'wireframe')
+
+
 // 添加辅助标线
 // const axesHelper = new THREE.AxesHelper(500)
 // scene.add(axesHelper)
@@ -142,7 +181,9 @@ renderer.render(scene, camera)
 
 // let time = Date.now()
 // const clock = new THREE.Clock()
-console.log(gsap);
+
+// GSAP
+// console.log(gsap);
 // gsap.to(group.position, { duration: 1, delay: 1, x: 40 })
 // gsap.to(group.position, { duration: 1, delay: 3, x: 0 })
 
