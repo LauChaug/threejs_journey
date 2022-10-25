@@ -2,7 +2,7 @@ import './style.css'
 import * as THREE from 'three'
 import gsap from 'gsap'
 import * as dat from 'dat.gui'
-import { BufferAttribute, Mesh, MeshBasicMaterial } from 'three';
+import { BoxGeometry, BufferAttribute, Mesh, MeshBasicMaterial, Texture } from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const parameters = {
@@ -54,6 +54,27 @@ const scene = new THREE.Scene()
 // cube.rotation.y = 0
 // cube.rotation.z = 0.5
 
+// TEXTURE method 1
+// const image = new Image()
+// const texture = new THREE.Texture(image)
+// image.onload = () => {
+//   console.log('texture');
+//   texture.needsUpdate = true
+// }
+// image.src = '/door.jpg'
+
+
+
+// TEXTURE method 2 textureloader
+const textureLoader = new THREE.TextureLoader()
+const texture = textureLoader.load('/door.jpg')
+
+// change the center and rotate the cube
+texture.rotation = Math.PI * 0.25
+texture.center.x = 0.5
+texture.center.y = 0.5
+// texture.minFilter = THREE.LinearMipMapLinearFilter
+
 // 创建一个group
 
 const group = new THREE.Group()
@@ -87,7 +108,14 @@ for (let i = 0; i < count * 3 * 3; i++) {
 const positionAttribute = new BufferAttribute(positionArray, 3)
 geometry.setAttribute('position', positionAttribute)
 const material = new MeshBasicMaterial({ color: parameters.color, wireframe: true })
-const cube = new THREE.Mesh(geometry, material)
+const triangles = new THREE.Mesh(geometry, material)
+
+const material1 = new MeshBasicMaterial({ map: texture })
+const geometryCube = new BoxGeometry(10, 10, 10)
+const cube = new Mesh(geometryCube, material1)
+// cube.position.set(10, 10, 10)
+
+
 group.add(cube)
 
 const sizes = {
@@ -134,7 +162,8 @@ const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 1.0, 
 camera.position.set(1, 5, 30)
 // camera.position.x = 40
 // camera.position.y = 40
-camera.lookAt(group.position)
+// camera.lookAt(group.position)
+camera.lookAt(cube.position)
 scene.add(camera)
 
 const canvas = document.querySelector('.webgl')
