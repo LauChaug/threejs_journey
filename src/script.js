@@ -2,7 +2,7 @@ import './style.css'
 import * as THREE from 'three'
 import gsap from 'gsap'
 import * as dat from 'dat.gui'
-import { BoxGeometry, BufferAttribute, Mesh, MeshBasicMaterial, Texture } from 'three';
+import { BoxGeometry, BufferAttribute, Mesh, MeshBasicMaterial, SphereGeometry, Texture } from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const parameters = {
@@ -14,6 +14,7 @@ const parameters = {
 }
 
 // 初始化gui面板时传递对象参数，设置closed为true，gui面板关闭状态
+// const gui = new dat.GUI({ closed: true })
 const gui = new dat.GUI({ closed: true })
 
 // 隐藏gui面板
@@ -68,12 +69,24 @@ const scene = new THREE.Scene()
 // TEXTURE method 2 textureloader
 const textureLoader = new THREE.TextureLoader()
 const texture = textureLoader.load('/door.jpg')
+const matcapTexture = textureLoader.load('/textrues/matcaps/8.png')
 
 // change the center and rotate the cube
-texture.rotation = Math.PI * 0.25
+// texture.rotation = Math.PI * 0.25
 texture.center.x = 0.5
 texture.center.y = 0.5
 // texture.minFilter = THREE.LinearMipMapLinearFilter
+
+// 创建环境灯光
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+// 将灯光添加到场景中
+scene.add(ambientLight)
+// 创建点光源
+const pointLight = new THREE.PointLight(0xffffff, 0.5)
+pointLight.position.x = 30
+pointLight.position.y = 30
+pointLight.position.z = 30
+scene.add(pointLight)
 
 // 创建一个group
 
@@ -107,16 +120,56 @@ for (let i = 0; i < count * 3 * 3; i++) {
 }
 const positionAttribute = new BufferAttribute(positionArray, 3)
 geometry.setAttribute('position', positionAttribute)
-const material = new MeshBasicMaterial({ color: parameters.color, wireframe: true })
-const triangles = new THREE.Mesh(geometry, material)
+// const material = new THREE.MeshBasicMaterial({ color: parameters.color, wireframe: true })
+// const material = new THREE.MeshNormalMaterial()
+const material3 = new THREE.MeshDepthMaterial()
+const triangles = new THREE.Mesh(geometry, material3)
+// const material = new THREE.MeshLambertMaterial()
+// const material = new THREE.MeshPhongMaterial()
+// const material = new THREE.MeshToonMaterial()
+const material = new THREE.MeshStandardMaterial()
+material.metalness = 0.45
+material.roughness = 0.45
+gui.add(material, 'metalness').min(0).max(1).step(0.001)
+gui.add(material, 'roughness').min(0).max(1).step(0.001)
+// material.color = new THREE.Color('#008c8c')
+// material.flatShading = true
+material.shininess = 100
+material.specular = new THREE.Color('#008c8c')
 
-const material1 = new MeshBasicMaterial({ map: texture })
-const geometryCube = new BoxGeometry(10, 10, 10)
-const cube = new Mesh(geometryCube, material1)
+const material1 = new THREE.MeshBasicMaterial({ map: texture })
+// material1.side = THREE.DoubleSide
+
+const geometryCube = new THREE.BoxGeometry(10, 10, 10)
+const cube = new THREE.Mesh(geometryCube, material1)
 // cube.position.set(10, 10, 10)
 
+const sphere = new THREE.Mesh(
+  new SphereGeometry(2, 20, 20),
+  // new THREE.MeshBasicMaterial({ map: matcapTexture })
+  new THREE.MeshStandardMaterial({ map: texture, aoMap: texture })
+)
+sphere.geometry.setAttribute('uv2', new THREE.BufferAttribute(sphere.geometry.attributes.uv.array, 2))
 
-group.add(cube)
+const plane = new THREE.Mesh(
+  new THREE.PlaneGeometry(10, 10),
+  material
+)
+plane.geometry.setAttribute('uv2', new THREE.BufferAttribute(plane.geometry.attributes.uv.array, 2))
+
+const torus = new THREE.Mesh(
+  new THREE.TorusGeometry(6, 2, 20, 34),
+  material
+)
+console.log(torus.geometry);
+torus.geometry.setAttribute('uv2', new THREE.BufferAttribute(torus.geometry.attributes.uv.array, 2))
+
+plane.position.x = 30
+sphere.position.x = 13
+torus.position.x = -19
+
+
+group.add(cube, sphere, plane, torus)
 
 const sizes = {
   width: window.innerWidth,
@@ -158,7 +211,7 @@ window.addEventListener('dblclick', () => {
   }
 })
 
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 1.0, 100)
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 1.0, 1000)
 camera.position.set(1, 5, 30)
 // camera.position.x = 40
 // camera.position.y = 40
